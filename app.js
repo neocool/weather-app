@@ -1,10 +1,29 @@
-import request from 'postman-request';
+import * as Geocode from './utils/geocode.js'
+import * as Forecast from './utils/forecast.js'
+
+const address = process.argv[2]
+
+const getWeather = (address) => {
+    Geocode.geocode(address, (error, {latitude,longitude,location}={}) => {
+        if (error){
+            console.log(error)
+        }
+        else{            
+            Forecast.forecast(latitude,longitude, (error,data)=> {
+                if (error){
+                    return console.log(error)
+                }
+                console.log('Location:',location )                
+                console.log('Weather:', data)
+            })
+        }
+    })
+
+}
 
 
-const url = 'http://api.weatherstack.com/current?access_key=2c2924b29f5d3025759b82df5c01ed9c&query=37.8267,-122.4233'
-
-
-request({url:url},(error,response) => {
-    const data = JSON.parse(response.body)
-    console.log(data.current)
-})
+if (!address){
+    console.log("Please provide an address")
+}else{
+    getWeather(address)
+}
